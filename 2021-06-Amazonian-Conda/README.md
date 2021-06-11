@@ -2,13 +2,13 @@
 (Running an AWS Lambda function against an Anaconda runtime)
 
 ## Introduction
-As a consulting data scientist, I believe a key consideration is flexibility to perform technical work across a range
-  of environments, to meet my customer's specific needs.  At the same time, I am always looking for ways to re-use pre-existing work,
-  and in particular to shift data workloads to the cloud wherever possible.
+As a consulting data scientist, I believe a key strength is flexibility to perform technical work across a range
+  of environments, to meet my customer's specific needs.  At the same time, I am always looking for ways to re-use existing work,
+  and also to shift data workloads to the cloud wherever possible.
 
 The conda package manager allows the consistent definition of Python runtimes, portable across machines and systems.
-In this blog, I shall sketch out how to make the most of this feature, and how a conda-defined environment
-  can be used with AWS Lambda to lift-and-shift a local workload straight to the cloud. 
+In this blog, I shall sketch out how to make the most of this feature, and AWS Lambda can use a conda-defined environment,
+  lifting-and-shifting a local workload to the cloud. 
 
 
 ## Why Anaconda?
@@ -28,11 +28,11 @@ On a further technical note, the packages maintained at [anaconda.org](https://a
 
 ## Mastering the conda
 ### Creating and updating an environment
-Let's first recap how to create a conda environment with some useful dependencies, 
+Let's first recap how to create a conda environment with some example dependencies, 
 and export its definition for re-use.
 
 Assuming we've installed Anaconda, we can create a new, dedicated environment
-  for our data science work:
+  for our specific data science work:
 
     conda create --name blog-test
 
@@ -45,18 +45,19 @@ Unpacking the second command a bit:
 * We've chosen to take packages from the `conda-forge` channel, which gives us access to the latest and greatest 
   versions of many popular open-source packages.
 * We've pinned the core Python version to 3.8, which is a generally available version.
-* We've added the additional packages `requests` (for nicer HTTP calls) and `pandas` (for the data science, obviously!).
+* As an example we've added the additional packages `requests` (for nicer HTTP calls) and `pandas` 
+    (for the data science, obviously!).
 
 We can now export the definition of the new environment to a file:
 
     conda env export --no-build --file blog-test.yml
 
-You can see the results [here](blog-test.yml).  Notice the last line saves the path of the environment your own machine;
+You can see the results [here](blog-test.yml).  Notice the last line saves the path of the environment on your own machine;
   don't worry about this, as it won't prevent installing the environment in a different place elsewhere.
 
-Note the `--no-build` flag.  This is really important if you want your environment to be portable 
+Note the `--no-build` flag.  This is key if you want your environment to be portable 
   between Windows, Linux and Mac; it saves the packages definitions without specific build numbers,
-  which would only be available for your own operating system.
+  which would only be available for one operating system.
 
 ### Using that environment
 If your colleague takes this file, they can create an identical conda environment of their own by running:
@@ -68,7 +69,7 @@ If your colleague takes this file, they can create an identical conda environmen
 I promised that the conda environment file would be portable across other machine types.  But what about the cloud?
 
 At Bays Consulting, we are enthusiastic users of Amazon Web Services.  In particular, the AWS Lambda serverless compute
-  engine provides a cost-effective way to run small(ish) tasks, without worrying about running and maintaining the
+  engine provides a cost-effective way to run smallish tasks, without worrying about creating and maintaining the
   underlying infrastructure.  One supported language runtime is Python, but running a Python script that requires
   dependencies can be tricky.
 
@@ -116,7 +117,7 @@ As an example, we copy over a single script to run as our application, which you
 
     COPY example.py /opt/my-code/example.py
 
-We configure the image's PYTHONPATH to include our dependencies and our own code as well:
+We configure the image's PYTHONPATH to include both dependencies and project code:
     
     ENV PYTHONPATH "/var/lang/lib/python3.8/site-packages:/opt/my-code"
 
@@ -136,12 +137,13 @@ I would now go ahead and upload this image to AWS Elastic Container Registry, an
   For now, this is left as an exercise to the reader!
   The AWS documentation [here](https://docs.aws.amazon.com/lambda/latest/dg/images-create.html) is a good starting point.
 
-I'll pick out one tip; how to test the newly build image locally.  Use this command to start a container from the image,
+I'll pick out one tip; how to test the newly built image locally.  Use this command to start a container from the image,
   and map requests to port 9000 to the container's local 8080 port, where the Lambda entrypoint will be listening:
 
     docker run --rm -it -p 9000:8080 blog-test
 
-Now in a separate window, you can issue requests to this container, simulating what Amazon will do when a Lambda function is invoked:
+Now in a separate window, you can issue requests to this container,
+  simulating what Amazon will do when a Lambda function is invoked in the real world:
 
     curl -d "{}" localhost:9000/2015-03-31/functions/function/invocations
 
