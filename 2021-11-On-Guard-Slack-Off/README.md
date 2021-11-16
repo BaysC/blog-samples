@@ -113,12 +113,19 @@ the base Python `urllib` dependency:
 Then we can join it all together in the Lambda's entrypoint function,
 putting together some key information into a Slack message.
 
+I've saved an example finding [here](example-finding.json) to see what fields might be available. 
+
     def lambda_handler(event, context):
         account_id = event["account"]
         severity = event["detail"]["severity"]
         title = event["detail"]["title"]
 
         do_post(slack_url, {"text": f":warning: *{severity}*: *{account_id}*: {title} :warning:"})
+
+You can use the example finding as a test event in the Lambda console.
+If all is working as expected, you'll see the message pop up in Slack:
+
+![Slack message example](screenshots/02-lambda-test.png)
 
 Finally, we can wire the function up to GuardDuty, via EventBridge.
 
@@ -180,7 +187,6 @@ including **bold**, _italic_ and emojis,
 a single-line message is a bit restrictive. 
 For a more richly formatted view, we can use Slack's [Block Kit](https://api.slack.com/block-kit/building),
 to combine blocks of information into an attractive and clear message.
-I've saved an example finding [here](example-finding.json) to see what fields might be available. 
 
 The complete function source is available [here](lambda_function.py).
 I would be interested to hear from anyone who has found this useful,
