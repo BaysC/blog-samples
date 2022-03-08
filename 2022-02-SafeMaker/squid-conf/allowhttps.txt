@@ -1,0 +1,5 @@
+anaconda.org
+pypi.org
+pip.repos.neuron.amazonaws.com
+files.pythonhosted.org
+example-bucket.s3.eu-west-2.amazonaws.com
