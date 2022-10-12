@@ -2,15 +2,15 @@
 Downloading from interactive, secure portals while preserving data residency in the cloud.
 
 ## We love the cloud
-At Bays Consulting, we prefer wherever possible to store and process our clients' data in the cloud,
-typically the storage and compute components of Amazon Web Services.
+At Bays Consulting, we prefer, wherever possible, to store and process our clients' data in the cloud,
+typically the choosing storage and compute components of Amazon Web Services.
 
-Furthermore, for many of our projects we have contractually agreed requirement that data resides in the cloud at all times,
-and is not copied to local employee machines. This generally has two motivations.
+Furthermore, for many of our projects we have contractually agreed requirements that data resides in the cloud at all times,
+and is not copied to employees' local machines; this generally has two motivations.
 
-Firstly, data protection laws may impose specific geographical data residency requirements, such that personal data
+Firstly, data protection laws may impose specific geographical data residency requirements, such as that personal data
 remain within the UK or within the European Economic Area. Such residency requirements are well understood by cloud service providers;
-in Amazon's case this in principally covered by the use of specific regions such as `Europe (London)`.
+in Amazon's case these are principally covered by the use of specific regions such as `Europe (London)`.
 
 Secondly, the security controls applied to the cloud to monitor and prevent data loss, and to segregate client data, are well understood
 and can be documented and audited by our customers.
@@ -27,10 +27,9 @@ For publicly available data, one can usually download data straight into a cloud
 from a terminal on a cloud virtual machine. Once on the virtual machine's local storage, another command will take care of
 uploading it to S3 or equivalent blob storage.
 
-Often however, a customer will grant us access to download the data from a secure portal, perhaps
-a shared folder in Google Drive or Microsoft SharePoint, or some in-house or 3rd-party transfer site. It seems a new method comes
-along every day!
-
+Often, however, a customer will grant us access to download the data from a secure portal, perhaps
+a shared folder in Google Drive or Microsoft SharePoint, or some in-house or 3rd-party transfer site. 
+It seems a new method comes along every day! 
 Each of these secure web portals will typically have an interactive process for authentication, perhaps involving setting up
 an account and often applying Multi-Factor Authentication. So how can we acquire the data directly into the cloud,
 without first downloading to a laptop and then re-uploading?
@@ -48,7 +47,7 @@ While there is no one-size-fits all approach, some ideas to consider might inclu
 * Download from a more headless, machine-friendly portal such as an SFTP site or a Samba mount.
 * API or CLI download from the existing portal. 
   Typically, this will require some setup on the customer side to create an API key or equivalent. 
-  Check out the following:
+  Check out the following, for example:
   * [CLI for Microsoft 365](https://github.com/pnp/cli-microsoft365)
   * [Google Drive API](https://developers.google.com/drive/api/guides/manage-downloads)
 
@@ -63,7 +62,7 @@ shown on the interactive web portal, the downloaded data itself will never touch
 There are a range of ways to achieve this, from fully managed solutions to more home-grown integrations.
 
 ### Amazon Workspaces Web
-A recently launched service by Amazon, comprising a fully managed, cloud-hosted browser pixel-streamed to the desktop.
+This is a recently launched service by Amazon, comprising a fully managed, cloud-hosted browser pixel-streamed to the desktop.
 
 It relies on a SAML-based identity provider for authentication, which could be AWS IAM Identity Center 
 (successor to AWS Single Sign-On) if you already have that set up. It can be set up inside a VPC, if you have
@@ -81,12 +80,12 @@ Helpfully, the standard sample image includes Firefox running on a Windows Serve
 As above, the resources can run inside a VPC, allowing access to local VPC endpoints and directing internet traffic
 through a particular established route or proxy.
 
-The pricing is much more attractive, being relatively high compared to a base EC2 instance but billed per hour. 
+The pricing is a bit more attractive, being relatively high compared to a base EC2 instance but billed per hour. 
 Users can be provisioned in a simple way, without needing to deal in SAML documents!
 
 I gave this a go, creating a Stack and associated Fleet from the Amazon AppStream2 Sample Image.
 
-I made myself a user with entitlements on the stack, immediately receiving an email to my inbox with instructions for 
+I created myself a user with entitlements on the stack, immediately receiving an email to my inbox with instructions for 
 completing the account set up. Confusingly, an error message popped up to say that I had no applications available,
 but after waiting 10-15 minutes for the fleet to initialise fully, and then another couple of minutes to "prepare" my session,
 I could open Firefox.
@@ -103,18 +102,18 @@ from which it can be copied, if necessary, to the intended S3 bucket,
 using the [AWS S3 CLI](https://docs.aws.amazon.com/cli/latest/reference/s3/cp.html).
 
 Overall it was a fairly user-friendly experience. The drawbacks for me are:
-* From a security perspective, the standalone authentication process introduces a new attack service to worry about.
-* I couldn't upload directly into the preferred S3 bucket.
+* From a security perspective, the standalone authentication process introduces a new attack surface to worry about.
+* I couldn't upload directly into my preferred S3 bucket, but only into a bucket created by the service.
 * Although the cost is theoretically elastic, minimum charges and long initialisation times ran up a usage bill of $0.27,
-  which is high compared to the home-made EC2 options below, and on top a whopping $4.19 Windows licencing charge (payable per month).
+  which is high compared to the home-made EC2 options below, and, on top, a whopping $4.19 Windows licencing charge (payable per month).
 
 ### Windows Server over RDP
 Previously my preferred method, one can create a vanilla Windows Server virtual machine using Amazon EC2, billed per hour.
 
 Once you have obtained the Administrator password from your SSH key, and opened up port 3389, you can
-log straight in to the server's desktop using Remote Desktop Protocol.
+log straight in to the server's desktop using the Remote Desktop Protocol, a client for which comes bundled with Windows.
 
-For Windows to funtion properly you do need to allocate reasonable CPU and memory, which pushes the overall cost up
+For Windows to function properly, you do need to allocate reasonable CPU and memory, which pushes the overall cost up
 when the additional Windows software charge is included.
 
 In addition, I find the process of getting online surprisingly inconvenient, 
@@ -143,18 +142,18 @@ in the EPEL repository for ARM.
     sudo amazon-linux-extras install firefox -y
 
 Then you will need local X software, such as [Xming](https://sourceforge.net/projects/xming/), 
-to display the browser window. I also find performance on Windows better with [PuTTY](https://www.putty.org/),
+to display the browser window. I find performance on Windows better with [PuTTY](https://www.putty.org/),
 rather than the built-in OpenSSH client.
 
 I won't detail the remaining steps to get this set up, as various online guides are available, and above all
 because I have given up on this approach for reasons of performance. The browser is so slow to render over my home
 internet connection that it is simply too painful to complete the interactive login process.
 It may be that clever tuning of the graphics and SSH connection would resolve this, 
-but I would recommend one of the approaches below.
+but instead I would recommend one of the approaches below.
 
 ### VNC over SSH
-A more modern and comprehensive alternative to X11 forwarding, VNC software streams a complete graphical
-desktop environment to your local machine.
+A more modern and comprehensive alternative to X11 forwarding, Virtual Network Computing (VNC)
+software streams a complete graphical desktop environment to your local machine.
 
 You still need to install dedicated VNC software, such as [TigerVNC](https://tigervnc.org/)
 on both client and server, but as with X11 above the connection can piggyback on existing virtual machine and SSH infrastructure,
@@ -172,15 +171,15 @@ It turns out that Amazon have made the underlying streaming technology for AppSt
 available at no additional cost when run on Amazon EC2, and it can even run over SSH forwarding.
 
 The [installation process](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux.html)
-for an existing Amazon Linux instance is prohibitively long, but there is a pre-built AMI available instead.
+for an existing Amazon Linux instance is prohibitively complex, but fortunately there is a pre-built AMI available instead.
 
 To get up and running, launch a new EC2 instance using either 
 [NICE DCV for Amazon Linux 2](https://aws.amazon.com/marketplace/pp/prodview-ulbymol35e3ws) or
 [NICE DCV for Amazon Linux 2 (ARM)](https://aws.amazon.com/marketplace/pp/prodview-lb5bojtkc3wv2)
 depending on your choice of architecture. I ran a `t4g.small` Spot instance, costing less than $0.01 per hour.
 
-There's no need to whitelist any ports other than SSH (22), as you can connect with a port forward of 8443,
-which is used to serve the remote desktop, running something like:
+There's no need to whitelist any ports other than SSH (22), as you can connect by forwarding port 8443,
+used to serve the remote desktop, running something like:
 
     ssh -L 8443:localhost:8443 -i ~/.ssh/your-key.pem ec2-user@ec2-xx-xx-xx-xx.eu-west-2.compute.amazonaws.com
 
@@ -209,17 +208,17 @@ In the screenshot below, you can see the cloud browser (Firefox) running inside 
 I am pleased with the discovery of this new approach. It is simple to deploy, extremely cost-effective, and a pleasure to use.
 To make it even better for the security conscious, I would suggest applying some additional hardening.
 
-Firstly, the DCV server listens by default for incoming external connections, but if using SSH forwarding this exposes
+First, the DCV server listens by default for incoming external connections, but if using SSH forwarding this exposes
 an unnecessary attack surface, albeit one hopefully protected by AWS Security Groups! 
 To listen on loopback only, edit `/etc/dcv/dcv.conf` and set the following in the `[connectivity]` section;
 you will need to restart the `dcvserver` daemon for the changes to take effect.
 
     web-listen-endpoints=['127.0.0.1:8443', '[::1]:8443']
 
-Secondly, by default `ec2-user` has full administrative privileges, unnecessary for downloading and storing a file.
+Second, by default `ec2-user` has full administrative privileges, unnecessary for downloading and storing a file.
 I would suggest creating a dedicated `dcv-user` without any privileges, and then launching the DCV session for that user.
 
-Thirdly, to reduce accidental data loss, there are additional policies that you can apply to restrict file transfers
+Third, to reduce accidental data loss, there are additional policies that you can apply to restrict file transfers
 and clipboard access between the remote and local session. 
 [This documentation](https://docs.aws.amazon.com/dcv/latest/adminguide/security-authorization-file-create.html)
 gives some examples.
@@ -231,7 +230,7 @@ gives some pointers for setting up the free ClamAV scanner.
 ## Conclusion
 Keeping sensitive data in the cloud at all times is a desirable and often mandatory goal.
 While machine-friendly APIs and CLIs are the ideal vector to transfer data from one secure location to another,
-for one-off data deliveries it may not be feasible to set one up.
+for one-off data deliveries it may be infeasible to set one up.
 
-By launching a secure browser in the cloud, perhaps using the NICE DCV protocol or another approach outined above, 
+By launching a secure browser in the cloud, perhaps using the NICE DCV protocol or another approach outlined above, 
 you can perform the required interactive login steps and download the data of interest.
