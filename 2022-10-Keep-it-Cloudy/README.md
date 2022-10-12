@@ -226,3 +226,9 @@ Finally, consider running automatic anti-malware scans of downloaded files.
 gives some pointers for setting up the free ClamAV scanner.
 
 ## Conclusion
+Keeping sensitive data in the cloud at all times is a desirable and often mandatory goal.
+While machine-friendly APIs and CLIs are the ideal vector to transfer data from one secure location to another,
+for one-off data deliveries it may not be feasible to set one up.
+
+By launching a secure browser in the cloud, perhaps using the NICE DCV protocol or another approach outined above, 
+you can perform the required interactive login steps and download the data of interest.
