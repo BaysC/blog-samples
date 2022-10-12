@@ -105,8 +105,8 @@ using the [AWS S3 CLI](https://docs.aws.amazon.com/cli/latest/reference/s3/cp.ht
 Overall it was a fairly user-friendly experience. The drawbacks for me are:
 * From a security perspective, the standalone authentication process introduces a new attack service to worry about.
 * I couldn't upload directly into the preferred S3 bucket.
-* Although the cost is theoretically elastic, minimum charges and long initialisation times ran up a bill of $0.27,
-  which is high compared to the home-made EC2 options below.
+* Although the cost is theoretically elastic, minimum charges and long initialisation times ran up a usage bill of $0.27,
+  which is high compared to the home-made EC2 options below, and on top a whopping $4.19 Windows licencing charge (payable per month).
 
 ### Windows Server over RDP
 Previously my preferred method, one can create a vanilla Windows Server virtual machine using Amazon EC2, billed per hour.
