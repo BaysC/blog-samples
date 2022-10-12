@@ -153,33 +153,76 @@ It may be that clever tuning of the graphics and SSH connection would resolve th
 but I would recommend one of the approaches below.
 
 ### VNC over SSH
+A more modern and comprehensive alternative to X11 forwarding, VNC software streams a complete graphical
+desktop environment to your local machine.
 
-https://tigervnc.org/
-Pros
-* Add "AcceptCutText=0", "SendCutText=0"
-* Use CLI to re-upload to S3, including use of instance role for AUTHx
-* Piggy back on existing SSH
+You still need to install dedicated VNC software, such as [TigerVNC](https://tigervnc.org/)
+on both client and server, but as with X11 above the connection can piggyback on existing virtual machine and SSH infrastructure,
+which gives some peace of mind from a security perspective.
 
-
-    $env:DISPLAY="127.0.0.1:0.0"
-
-* sudo yum install xauth
-  echo $DISPLAY
-[ec2-user@ip-172-31-9-218 ~]$ echo $DISPLAY
-localhost:10.0
-
-https://aws.amazon.com/premiumsupport/knowledge-center/ec2-linux-2-install-gui/
-
-https://aws.amazon.com/appstream2/pricing/
-
-Price??
+Amazon have provided a complete set of instructions [here](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-linux-2-install-gui/).
 
 ### NICE DCV: the winner?
+To evaluate the options so far, the VNC option wins on price and flexibility, but has the drawback that local software 
+must be installed, which may not be feasible or even permitted depending on your organisation's policies. 
+Amazon AppStream 2, on the other hand, provides an entirely web-based client, but at a significantly higher cost and lower flexibility.
 
-https://docs.aws.amazon.com/dcv/latest/adminguide/security-authorization-file-create.html for copy paste
+It turns out that Amazon have made the underlying streaming technology for AppStream, 
+[NICE DCV](https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html),
+available at no additional cost when run on Amazon EC2, and it can even run over SSH forwarding.
 
-    [connectivity]
+The [installation process](https://docs.aws.amazon.com/dcv/latest/adminguide/setting-up-installing-linux.html)
+for an existing Amazon Linux instance is prohibitively long, but there is a pre-built AMI available instead.
+
+To get up and running, launch a new EC2 instance using either 
+[NICE DCV for Amazon Linux 2](https://aws.amazon.com/marketplace/pp/prodview-ulbymol35e3ws) or
+[NICE DCV for Amazon Linux 2 (ARM)](https://aws.amazon.com/marketplace/pp/prodview-lb5bojtkc3wv2)
+depending on your choice of architecture. I ran a `t4g.small` Spot instance, costing less than $0.01 per hour.
+
+There's no need to whitelist any ports other than SSH (22), as you can connect with a port forward of 8443,
+which is used to serve the remote desktop, running something like:
+
+    ssh -L 8443:localhost:8443 -i ~/.ssh/your-key.pem ec2-user@ec2-xx-xx-xx-xx.eu-west-2.compute.amazonaws.com
+
+Once in to the instance with SSH, you will need to launch a new session by running:
+
+    dcv create-session my-session
+
+And set a password for the `ec2-user` by running 
+
+    sudo passwd ec2-user
+
+(Alternatively, you can disable password authentication by editing the configuration file `/etc/dcv/dcv.conf`.)
+
+Then install a browser using one of the commands above, e.g.
+
+    sudo amazon-linux-extras install firefox -y
+
+Then using your local browser of choice, navigate to `http://localhost:8443`.
+Bypass any certificate warnings (the whole connection is going over SSH anyway) and enter the `ec2-user` credentials set above.
+Perform the interactive login and download, and then you can use the AWS CLI to upload from the local storage to S3.
+
+#### Additional hardening
+I am pleased with the discovery of this new approach. It is simple to deploy, extremely cost-effective, and a pleasure to use.
+To make it even better for the security conscious, I would suggest applying some additional hardening.
+
+Firstly, the DCV server listens by default for incoming external connections, but if using SSH forwarding this exposes
+an unnecessary attack surface, albeit one hopefully protected by AWS Security Groups! 
+To listen on loopback only, edit `/etc/dcv/dcv.conf` and set the following in the `[connectivity]` section;
+you will need to restart the `dcvserver` daemon for the changes to take effect.
+
     web-listen-endpoints=['127.0.0.1:8443', '[::1]:8443']
 
+Secondly, by default `ec2-user` has full administrative privileges, unnecessary for downloading and storing a file.
+I would suggest creating a dedicated `dcv-user` without any privileges, and then launching the DCV session for that user.
+
+Thirdly, to reduce accidental data loss, there are additional policies that you can apply to restrict file transfers
+and clipboard access between the remote and local session. 
+[This documentation](https://docs.aws.amazon.com/dcv/latest/adminguide/security-authorization-file-create.html)
+gives some examples.
+
+Finally, consider running automatic anti-malware scans of downloaded files. 
+[This blog](https://docs.aws.amazon.com/dcv/latest/adminguide/security-authorization-file-create.html)
+gives some pointers for setting up the free ClamAV scanner.
 
 ## Conclusion
