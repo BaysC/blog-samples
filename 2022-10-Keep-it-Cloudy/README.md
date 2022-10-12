@@ -202,6 +202,9 @@ Then using your local browser of choice, navigate to `http://localhost:8443`.
 Bypass any certificate warnings (the whole connection is going over SSH anyway) and enter the `ec2-user` credentials set above.
 Perform the interactive login and download, and then you can use the AWS CLI to upload from the local storage to S3.
 
+In the screenshot below, you can see the cloud browser (Firefox) running inside a Linux desktop, accessed from Chrome on Windows.
+![Firefox running over DCV](./DCV-Firefox.png)
+
 #### Additional hardening
 I am pleased with the discovery of this new approach. It is simple to deploy, extremely cost-effective, and a pleasure to use.
 To make it even better for the security conscious, I would suggest applying some additional hardening.
