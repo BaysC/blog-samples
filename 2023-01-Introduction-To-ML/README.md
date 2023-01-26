@@ -3,7 +3,7 @@
 With the rise in demand for machine learning (ML) over the last few years, comes the need for quality resources. 
 As data science and ML are becoming more and more popular, so is the importance of online communities. 
 Sharing knowledge, expertise and code amongst each other, can help experts keep up with the latest advances in the field. 
-Collaboration is crucial within the data science world, and is done so through resources such as blogs, articles and webinars. 
+Collaboration is crucial within the data science world, and is done through resources such as blogs, articles and webinars. 
 This opens the door for opportunities such as; discussing best practices, receiving feedback and learning from other experts.
 
 At Bays Consulting, we have recently started to explore sharing our knowledge and expertise through a series of webinars. 
@@ -39,15 +39,12 @@ Some considerations are as follows:
 - __Computation time__
     - Do you need a model that has quick training time or prediction time? or both?
 - __Explainability and interpretability vs Complexibility__
-    - Do you need a model that can be disected and explained easily? Or can you use a more complex model if it increases the accuracy but sacrifice on the interpretability?
+    - Do you need a model that can be dissected and explained easily? Or can you use a more complex model if it increases the accuracy but sacrifice on the interpretability?
 - __Scalability__
     - Does your model need to handle large volumes of data?
 - __Output__
     - _How_ is the output going to be used? E.g., are they going to be used to assist a stakeholder to make important business decisions? If so, the explainability may be what they are most interested in. Understanding how the results are generated and how the model is working can provide reassurance that the right decisions are being made.
 
 
-The webinar talks about the above topics in more detail and can be watched 
-
 In addition to the webinar, Bays Consulting are offering training courses. The Machine Learning Primer will give you hands-on experience in both supervised and unsupervised learning. If you are interested in ML but you are not sure where to start - this course is for you! By the end of the course, you will understand the foundations of ML and will be able build and interpret a simple model in Python.
 
-Sign up here 
